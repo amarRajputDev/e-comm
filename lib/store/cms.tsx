@@ -10,6 +10,8 @@ import {
   type ReactNode,
 } from "react";
 import { testimonials as defaultTestimonials } from "@/lib/data/reviews";
+import { banners as defaultBanners } from "@/lib/data/site";
+import type { Banner } from "@/types";
 
 /**
  * Storefront content management.
@@ -59,6 +61,8 @@ export interface CmsContent {
   newsletter: CmsNewsletter;
   testimonials: CmsTestimonial[];
   featuredSlugs: string[];
+  /** Promo + strip banners (the hero lives in `hero`). */
+  banners: Banner[];
 }
 
 const DEFAULT: CmsContent = {
@@ -97,6 +101,7 @@ const DEFAULT: CmsContent = {
     "grain-leather-tote",
     "merino-crew-knit",
   ],
+  banners: defaultBanners.filter((b) => b.placement !== "hero"),
 };
 
 const STORAGE_KEY = "an.cms";
@@ -115,6 +120,7 @@ function readStore(): CmsContent {
       sections: parsed.sections ?? DEFAULT.sections,
       testimonials: parsed.testimonials ?? DEFAULT.testimonials,
       featuredSlugs: parsed.featuredSlugs ?? DEFAULT.featuredSlugs,
+      banners: parsed.banners ?? DEFAULT.banners,
     };
   } catch {
     return DEFAULT;

@@ -1,12 +1,22 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { banners } from "@/lib/data/site";
+import { useCms } from "@/lib/store/cms";
 import { Reveal } from "@/components/motion/reveal";
 import { Img } from "@/components/ui/img";
 
-const promo = banners[1];
-
 export function PromoBanner() {
+  const { content, hydrated } = useCms();
+
+  const promo = hydrated
+    ? (content.banners.find((b) => b.placement === "promo" && b.active) ?? null)
+    : (banners.find((b) => b.placement === "promo" && b.active) ?? null);
+
+  /* Unpublishing the promo from /admin/banners hides the whole section. */
+  if (!promo) return null;
+
   return (
     <section className="relative isolate overflow-hidden bg-[#141210] py-24 md:py-32">
       {/* slow moving background */}
@@ -31,22 +41,19 @@ export function PromoBanner() {
         <Reveal y={34}>
           <p className="eyebrow flex items-center gap-3 text-[var(--accent)]">
             <span className="h-px w-8 bg-[var(--accent)]" />
-            Archive sale
+            {promo.eyebrow ?? "Archive sale"}
           </p>
-          <h2 className="display-lg mt-6 max-w-3xl text-white">
-            UP TO 30% OFF SELECTED STYLES
-          </h2>
+          <h2 className="display-lg mt-6 max-w-3xl text-white">{promo.title}</h2>
           <p className="mt-5 max-w-lg text-[16px] leading-relaxed text-white/70">
-            Last-chance pieces from the previous three seasons. Same fabric, same make — a
-            smaller price while stock lasts.
+            {promo.subtitle}
           </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-4">
             <Link
-              href="/collections/sale"
+              href={promo.href}
               className="group inline-flex h-[52px] items-center gap-3 bg-[var(--accent)] px-8 text-[11.5px] font-medium uppercase tracking-[0.16em] text-[var(--on-accent)] transition-colors hover:bg-[var(--accent-hover)]"
             >
-              Shop sale
+              {promo.cta}
               <ArrowRight
                 size={15}
                 className="transition-transform duration-300 group-hover:translate-x-1"

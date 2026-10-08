@@ -10,10 +10,13 @@ import { cn } from "@/lib/utils";
 export function MegaMenu({
   item,
   open,
+  onEnter,
   onClose,
 }: {
   item: NavItem | null;
   open: boolean;
+  /** Cancels the pending close timer when the pointer arrives from the nav. */
+  onEnter?: () => void;
   onClose: () => void;
 }) {
   return (
@@ -26,6 +29,8 @@ export function MegaMenu({
           exit={{ height: 0, opacity: 0 }}
           transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
           className="absolute inset-x-0 top-full hidden overflow-hidden border-b border-[var(--line)] bg-[var(--surface)] shadow-[var(--shadow-lift)] lg:block"
+          onMouseEnter={onEnter}
+          onPointerEnter={onEnter}
           onMouseLeave={onClose}
         >
           <div className="container-x">

@@ -243,6 +243,7 @@ export interface Testimonial {
 
 export interface Banner {
   id: ID;
+  eyebrow?: string;
   title: string;
   subtitle: string;
   image: string;

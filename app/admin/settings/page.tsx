@@ -4,7 +4,20 @@ import { useState } from "react";
 import { Building2, CreditCard, Globe, Truck, Users2, KeyRound, Check } from "lucide-react";
 import { SITE, FREE_SHIPPING_THRESHOLD, STANDARD_SHIPPING_FEE, EXPRESS_SHIPPING_FEE } from "@/lib/tokens";
 import { useUi } from "@/lib/store/providers";
+import { usePersistentState } from "@/lib/store/persistent";
 import { Button } from "@/components/ui/button";
+
+interface StoreSettings {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  currency: string;
+  gst: string;
+  freeShip: string;
+  standardShip: string;
+  expressShip: string;
+}
 import { Input, Label, Select } from "@/components/ui/input";
 import { PageHeader, Panel } from "@/components/admin/panel";
 import { cn } from "@/lib/utils";
@@ -48,17 +61,8 @@ function Toggle({
 
 export default function AdminSettingsPage() {
   const { toast } = useUi();
-  const [store, setStore] = useState<{
-    name: string;
-    email: string;
-    phone: string;
-    address: string;
-    currency: string;
-    gst: string;
-    freeShip: string;
-    standardShip: string;
-    expressShip: string;
-  }>({
+  /* Persisted to this device so a reload shows exactly what you saved. */
+  const [store, setStore] = usePersistentState<StoreSettings>("an.adminSettings.store", {
     name: SITE.name,
     email: SITE.email,
     phone: SITE.phone,
@@ -69,7 +73,7 @@ export default function AdminSettingsPage() {
     standardShip: String(STANDARD_SHIPPING_FEE),
     expressShip: String(EXPRESS_SHIPPING_FEE),
   });
-  const [payments, setPayments] = useState({
+  const [payments, setPayments] = usePersistentState("an.adminSettings.payments", {
     upi: true,
     card: true,
     netbanking: true,
@@ -79,8 +83,14 @@ export default function AdminSettingsPage() {
   const [saved, setSaved] = useState(false);
 
   const save = () => {
+    setStore((prev) => ({ ...prev }));
+    setPayments((prev) => ({ ...prev }));
     setSaved(true);
-    toast({ title: "Settings saved", description: "Changes are live on the storefront.", tone: "success" });
+    toast({
+      title: "Settings saved",
+      description: "Store configuration persisted to this device.",
+      tone: "success",
+    });
     window.setTimeout(() => setSaved(false), 2400);
   };
 

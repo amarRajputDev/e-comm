@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogOut, Moon, Sun, Monitor, Download, Trash2 } from "lucide-react";
 import { useSession, useTheme, useUi } from "@/lib/store/providers";
+import { usePersistentState } from "@/lib/store/persistent";
 import { ThemeMode } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
@@ -58,7 +59,8 @@ export default function SettingsPage() {
   const { toast } = useUi();
   const router = useRouter();
   const [confirm, setConfirm] = useState(false);
-  const [prefs, setPrefs] = useState({
+  /* Persisted — toggles survive a reload. */
+  const [prefs, setPrefs] = usePersistentState("an.customerPrefs", {
     orderUpdates: true,
     shippingAlerts: true,
     backInStock: true,

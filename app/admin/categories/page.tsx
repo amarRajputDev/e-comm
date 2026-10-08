@@ -10,13 +10,16 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Input, Label, Textarea } from "@/components/ui/input";
 import { PageHeader, Panel } from "@/components/admin/panel";
+import { ImagePickerDialog } from "@/components/admin/image-library";
 import { Img } from "@/components/ui/img";
+import { cn } from "@/lib/utils";
 
 export default function AdminCategoriesPage() {
   const { toast } = useUi();
   const [list, setList] = useState<Category[]>(seed);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Category | null>(null);
+  const [picking, setPicking] = useState<Category | null>(null);
   const [draft, setDraft] = useState({ name: "", tagline: "", description: "" });
 
   const move = (index: number, dir: -1 | 1) => {
@@ -149,7 +152,7 @@ export default function AdminCategoriesPage() {
                 <button
                   type="button"
                   className="inline-flex h-8 items-center gap-1.5 rounded-[3px] border border-[var(--line-strong)] px-3 text-[12.5px] text-[var(--ink-3)] transition-colors hover:border-[var(--ink-3)] hover:text-[var(--ink)]"
-                  onClick={() => toast({ title: "Media picker", description: "Connect storage to swap images." })}
+                  onClick={() => setPicking(cat)}
                 >
                   <ImagePlus size={13} /> Image
                 </button>
@@ -294,6 +297,31 @@ export default function AdminCategoriesPage() {
           </div>
         ) : null}
       </Dialog>
+
+      <ImagePickerDialog
+        open={Boolean(picking)}
+        title="Choose a tile image"
+        description={
+          picking ? `Swap the artwork shown for ${picking.name} on the homepage and shop.` : ""
+        }
+        selected={picking?.image.src}
+        onClose={() => setPicking(null)}
+        onSelect={(asset) => {
+          if (!picking) return;
+          const id = picking.id;
+          const name = picking.name;
+          setList((prev) =>
+            prev.map((c) =>
+              c.id === id ? { ...c, image: { src: asset.src, alt: asset.label } } : c,
+            ),
+          );
+          toast({
+            title: "Image updated",
+            description: `${name} now uses “${asset.label}”.`,
+            tone: "success",
+          });
+        }}
+      />
     </div>
   );
 }

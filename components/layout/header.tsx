@@ -94,14 +94,36 @@ export function SiteHeader() {
     setMega(null);
   }, [pathname]);
 
-  const openMega = (label: string) => {
+  const cancelClose = () => {
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
+  };
+
+  const closeMega = () => {
+    cancelClose();
+    setMega(null);
+  };
+
+  const openMega = (label: string) => {
+    cancelClose();
     setMega(label);
   };
+
+  /* Leaving the nav schedules a close, but entering the panel (which sits
+     outside the nav) must cancel it — otherwise the dropdown shuts while the
+     pointer is still travelling towards a link. */
   const scheduleClose = () => {
-    if (closeTimer.current) window.clearTimeout(closeTimer.current);
-    closeTimer.current = window.setTimeout(() => setMega(null), 140);
+    cancelClose();
+    closeTimer.current = window.setTimeout(() => setMega(null), 260);
   };
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeMega();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const activeItem = primaryNav.find((i) => i.label === mega) ?? null;
 
@@ -144,6 +166,7 @@ export function SiteHeader() {
                       href={item.href}
                       aria-haspopup={item.children ? "true" : undefined}
                       aria-expanded={item.children ? mega === item.label : undefined}
+                      onFocus={() => (item.children ? openMega(item.label) : null)}
                       className={cn(
                         "relative flex h-16 items-center text-[12.5px] font-medium uppercase tracking-[0.14em] transition-colors duration-200",
                         transparent ? "text-white/85 hover:text-white" : "text-[var(--ink-2)] hover:text-[var(--ink)]",
@@ -206,7 +229,12 @@ export function SiteHeader() {
             </div>
           </div>
 
-          <MegaMenu item={activeItem} open={Boolean(mega)} onClose={() => setMega(null)} />
+          <MegaMenu
+          item={activeItem}
+          open={Boolean(mega)}
+          onEnter={cancelClose}
+          onClose={closeMega}
+        />
         </header>
 
         <MobileNav />

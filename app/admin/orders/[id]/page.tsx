@@ -7,7 +7,7 @@ import { Panel, PageHeader } from "@/components/admin/panel";
 import { OrderTimeline } from "@/components/account/order-timeline";
 import { OrderActions } from "@/components/admin/order-actions";
 import { Avatar } from "@/components/admin/avatar";
-import { SaveNoteButton } from "@/components/admin/save-note-button";
+import { InternalNote } from "@/components/admin/internal-note";
 import { Img } from "@/components/ui/img";
 
 export default async function AdminOrderDetailPage(props: PageProps<"/admin/orders/[id]">) {
@@ -99,16 +99,8 @@ export default async function AdminOrderDetailPage(props: PageProps<"/admin/orde
             <OrderTimeline entries={order.timeline} />
           </Panel>
 
-          <Panel title="Internal notes">
-            <textarea
-              rows={3}
-              defaultValue={order.internalNote ?? ""}
-              placeholder="Add a note for the fulfilment team…"
-              className="w-full rounded-[3px] border border-[var(--line)] bg-[var(--surface-2)] px-3 py-2.5 text-[13.5px] text-[var(--ink)] placeholder:text-[var(--ink-3)] focus:border-[var(--ink-3)] focus:outline-none"
-            />
-            <div className="mt-3 flex justify-end">
-              <SaveNoteButton />
-            </div>
+          <Panel title="Internal notes" description="Saved per order, visible to staff only">
+            <InternalNote orderNumber={order.number} />
           </Panel>
         </div>
 
